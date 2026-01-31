@@ -8,11 +8,12 @@
         {% block stylesheets %}
         {% endblock %}
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
     </head>
-    <body>
+    <body{% if music is defined and music %} data-music="{{ music }}"{% endif %}>
+        {% if music is defined and music %}
+            <button id="audio-toggle" class="audio-toggle" type="button">Son: ON</button>
+        {% endif %}
         {% block body %}{% endblock %}
+        {% block javascripts %}{% endblock %}
     </body>
 </html>

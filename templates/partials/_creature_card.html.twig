@@ -1,0 +1,18 @@
+<article class="card">
+    <div class="card-header">
+        <span>{{ creature.nom }}</span>
+        <span class="card-type" style="border-color: {{ creature.type.couleur }};">
+            {{ creature.type.icone }} {{ creature.type.nom }}
+        </span>
+    </div>
+
+    <div class="card-image">
+        <img src="{{ asset('assets' ~ creature.image) }}" alt="{{ creature.nom }}">
+    </div>
+
+    <div class="stats-bar">
+        <span class="stats-badge">PV {{ creature.pvMax }}</span>
+        <span class="stats-badge">ATQ {{ creature.attaque }}</span>
+        <span class="stats-badge">DEF {{ creature.defens }}</span>
+    </div>
+</article>

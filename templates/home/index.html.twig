@@ -2,6 +2,11 @@
 
 {% block title %}Campus Protocol | Accueil{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/variables.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
+{% endblock %}
+
 {% block body %}
     <div class="page">
         <div class="container">
@@ -19,7 +24,7 @@
                         Lancer combat 1v1
                         <span>ENTREE</span>
                     </a>
-                    <a class="console-button" href="#">
+                    <a class="console-button" href="{{ path('app_bestiaire') }}">
                         Ouvrir bestiaire
                         <span>F2</span>
                     </a>
@@ -32,4 +37,8 @@
             </section>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/js/audio-player.js') }}" defer></script>
 {% endblock %}

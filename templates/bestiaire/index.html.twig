@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bestiaire | Campus Protocol{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/variables.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="page">
+        <div class="container">
+            <section class="console-shell bestiaire-shell">
+                <div class="console-header">
+                    <span>bestiaire@terminal</span>
+                    <span>registre creatures</span>
+                </div>
+                <h1 class="console-title">Bestiaire</h1>
+                <p class="console-subtitle">
+                    Catalogue des creatures du campus. Selectionne une carte pour lire les stats.
+                </p>
+            </section>
+
+            <section class="bestiaire-grid">
+                {% if creatures is empty %}
+                    <p class="text-bestiaire">Aucune creature debloquee pour le moment.</p>
+                {% endif %}
+                {% for creature in creatures %}
+                    {% include 'partials/_creature_card.html.twig' with { creature: creature } %}
+                {% endfor %}
+            </section>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/js/audio-player.js') }}" defer></script>
+{% endblock %}
