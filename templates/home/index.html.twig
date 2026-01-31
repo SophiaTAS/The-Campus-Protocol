@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Campus Protocol | Accueil{% endblock %}
+
+{% block body %}
+    <div class="page">
+        <div class="container">
+            <section class="console-shell">
+                <div class="console-header">
+                    <span>campus-protocol@terminal</span>
+                    <span>build: retro-01</span>
+                </div>
+                <h1 class="console-title">Campus Protocol</h1>
+                <p class="console-subtitle">
+                    Acces direct au mode combat et au bestiaire. Interface sobre, style console linux.
+                </p>
+                <div class="console-menu">
+                    <a class="console-button" href="#">
+                        Lancer combat 1v1
+                        <span>ENTREE</span>
+                    </a>
+                    <a class="console-button" href="#">
+                        Ouvrir bestiaire
+                        <span>F2</span>
+                    </a>
+                </div>
+                <div class="console-log">
+                    <div class="line"><span class="prompt">$</span> status: ready</div>
+                    <div class="line"><span class="prompt">></span> mercure: active</div>
+                    <div class="line"><span class="prompt">></span> creatures: 12 loaded</div>
+                </div>
+            </section>
+        </div>
+    </div>
+{% endblock %}
