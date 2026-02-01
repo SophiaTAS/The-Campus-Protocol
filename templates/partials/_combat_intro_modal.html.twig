@@ -1,0 +1,19 @@
+<div id="modal-intro-combat" class="modal-casier" style="display: flex;">
+    <div class="modal-content wide-modal intro-content glow">
+        <h1 class="versus-title">{{ joueur.nom }} ⚔️ VS ⚔️ {{ adversaire.nom }}</h1>
+
+        <div class="versus-cartes">
+            <div class="carte-intro gauche">
+                <img src="{{ asset('assets' ~ joueur.image) }}" alt="{{ joueur.nom }}">
+                <p class="nom-intro">{{ joueur.nom }}</p>
+            </div>
+            <div class="vs-label">VS</div>
+            <div class="carte-intro droite">
+                <img src="{{ asset('assets' ~ adversaire.image) }}" alt="{{ adversaire.nom }}">
+                <p class="nom-intro">{{ adversaire.nom }}</p>
+            </div>
+        </div>
+
+        <button type="button" class="btn-start-combat" id="btn-start-combat">🎮 Commencer le combat</button>
+    </div>
+</div>

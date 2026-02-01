@@ -1,0 +1,142 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Combat en cours | Campus Protocol{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/variables.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/combat-battle.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/combat-intro.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="page">
+        <div class="combat-arene" style="background-image: url('{{ asset('assets/' ~ arene.imagePath) }}');">
+            <header class="combat-header">
+                <div class="combat-title">
+                    ⚔️ Combat en cours
+                </div>
+                <div class="combat-arene-name">
+                    {{ arene.nom }}
+                </div>
+            </header>
+
+            <div class="combat-zone">
+                <section class="creature-carte {{ combat.etat.effet_visuel == 'x2' ? 'effet-x2' : (combat.etat.effet_visuel == 'x0.5' ? 'effet-x05' : '') }}">
+                    <h3>{{ joueur.nom }}</h3>
+                    <img src="{{ asset('assets' ~ joueur.image) }}" class="creature-image" alt="{{ joueur.nom }}">
+                    <p class="creature-type">{{ joueur.type.nom }}</p>
+
+                    {% set pvActuel = combat.etat.joueur_pv ?? joueur.pvMax %}
+                    {% set pvMax = joueur.pvMax %}
+                    {% set pourcentage = (pvActuel / pvMax * 100) | round(0, 'floor') %}
+                    {% set classeCouleur = pourcentage > 60 ? 'green' : (pourcentage > 30 ? 'orange' : 'red') %}
+                    <div class="barre-vie-container">
+                        <div class="barre-vie joueur {{ classeCouleur }}" style="width: {{ pourcentage }}%"></div>
+                    </div>
+                    <div class="pv-numerique">{{ pvActuel }} / {{ pvMax }}</div>
+
+                    <div class="stat-atq-def">
+                        <p>🗡️ Attaque</p>
+                        <div class="barre-stats-container">
+                            <div class="barre-stats attaque" style="width: 100%"></div>
+                        </div>
+                        <div class="stats-numerique">{{ attaqueJoueur }} / {{ joueur.attaque }}</div>
+
+                        <p>🛡️ Defense</p>
+                        <div class="barre-stats-container">
+                            <div class="barre-stats defense" style="width: 100%"></div>
+                        </div>
+                        <div class="stats-numerique">{{ defenseJoueur }} / {{ joueur.defens }}</div>
+                    </div>
+
+                    <div class="attaque-list">
+                        <h4>Attaques</h4>
+                        {% if joueur.attaques is defined and joueur.attaques|length > 0 %}
+                            <form method="post" action="{{ path('app_combat_attack', {id: combatId}) }}" class="attaque-form">
+                                {% for attaque in joueur.attaques %}
+                                    <button type="submit"
+                                            name="attaque"
+                                            value="{{ attaque.nom }}"
+                                            class="btn-attaque"
+                                            {% if not cEstMonTour or (combat.etat.joueur_pv ?? 0) <= 0 %}disabled{% endif %}>
+                                        {{ attaque.nom }} ({{ attaque.degats }})
+                                    </button>
+                                {% endfor %}
+                            </form>
+                        {% else %}
+                            <div class="attaque-empty">Aucune attaque chargee.</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="statuts">
+                        {% for effet in statuts.joueur %}
+                            <span class="badge-statut" title="{{ effet.description }}">
+                                {{ effet.icone }} {{ effet.nom }} x{{ effet.restant }}
+                            </span>
+                        {% else %}
+                            <span class="badge-statut">Aucun statut</span>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="combat-log-container">
+                    <div class="combat-log-header">🖥️ Journal du combat</div>
+                    <div class="combat-log-body">
+                        {% for ligne in combat.etat.log %}
+                            <p>{{ ligne }}</p>
+                        {% else %}
+                            <p>Aucun événement encore enregistré.</p>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="creature-carte {{ combat.etat.effet_visuel == 'x2' ? 'effet-x2' : (combat.etat.effet_visuel == 'x0.5' ? 'effet-x05' : '') }}">
+                    <h3>{{ adversaire.nom }}</h3>
+                    <img src="{{ asset('assets' ~ adversaire.image) }}" class="creature-image" alt="{{ adversaire.nom }}">
+                    <p class="creature-type">{{ adversaire.type.nom }}</p>
+
+                    {% set pvActuelAdv = combat.etat.adversaire_pv ?? adversaire.pvMax %}
+                    {% set pvMaxAdv = adversaire.pvMax %}
+                    {% set pourcentageAdv = (pvActuelAdv / pvMaxAdv * 100) | round(0, 'floor') %}
+                    {% set classeCouleurAdv = pourcentageAdv > 60 ? 'green' : (pourcentageAdv > 30 ? 'orange' : 'red') %}
+                    <div class="barre-vie-container">
+                        <div class="barre-vie adversaire {{ classeCouleurAdv }}" style="width: {{ pourcentageAdv }}%"></div>
+                    </div>
+                    <div class="pv-numerique">{{ pvActuelAdv }} / {{ pvMaxAdv }}</div>
+
+                    <div class="stat-atq-def">
+                        <p>🗡️ Attaque</p>
+                        <div class="barre-stats-container">
+                            <div class="barre-stats attaque" style="width: 100%"></div>
+                        </div>
+                        <div class="stats-numerique">{{ attaqueAdv }} / {{ adversaire.attaque }}</div>
+
+                        <p>🛡️ Defense</p>
+                        <div class="barre-stats-container">
+                            <div class="barre-stats defense" style="width: 100%"></div>
+                        </div>
+                        <div class="stats-numerique">{{ defenseAdv }} / {{ adversaire.defens }}</div>
+                    </div>
+
+                    <div class="statuts">
+                        {% for effet in statuts.adversaire %}
+                            <span class="badge-statut" title="{{ effet.description }}">
+                                {{ effet.icone }} {{ effet.nom }} x{{ effet.restant }}
+                            </span>
+                        {% else %}
+                            <span class="badge-statut">Aucun statut</span>
+                        {% endfor %}
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    {% include 'partials/_combat_intro_modal.html.twig' with { joueur: joueur, adversaire: adversaire } %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/js/audio-player.js') }}" defer></script>
+    <script src="{{ asset('assets/js/combat-intro.js') }}" defer></script>
+{% endblock %}

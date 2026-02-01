@@ -28,4 +28,16 @@ class CreatureRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findOneWithAttaquesAndType(int $id): ?Creature
+    {
+        return $this->createQueryBuilder('c')
+            ->addSelect('t', 'a')
+            ->leftJoin('c.type', 't')
+            ->leftJoin('c.attaques', 'a')
+            ->where('c.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
