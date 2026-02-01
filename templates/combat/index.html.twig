@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Combat 1v1 | Campus Protocol{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/variables.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/combat.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="page">
+        <div class="container">
+            <section class="console-shell combat-shell">
+                <div class="console-header">
+                    <span>combat@terminal</span>
+                    <span>mode: 1v1</span>
+                </div>
+                <h1 class="console-title">Combat 1v1</h1>
+                <p class="console-subtitle">
+                    Selectionne ta creature et une arene pour demarrer le duel.
+                </p>
+            </section>
+
+            <form class="combat-form" method="post" action="#">
+                <input type="hidden" name="creature_id" id="input-creature-id">
+                <input type="hidden" name="arene_id" id="input-arene-id">
+
+                <section class="combat-section">
+                    <h2 class="combat-title">1. Choisis ta creature</h2>
+                    <div class="bestiaire-grid combat-grid" id="combat-creatures">
+                        {% for creature in creatures %}
+                            <button type="button"
+                                    class="card combat-card"
+                                    data-id="{{ creature.id }}">
+                                <div class="card-header">
+                                    <span>{{ creature.nom }}</span>
+                                    <span class="card-type" style="border-color: {{ creature.type.couleur }};">
+                                        {{ creature.type.icone }} {{ creature.type.nom }}
+                                    </span>
+                                </div>
+                                <div class="card-image">
+                                    <img src="{{ asset('assets' ~ creature.image) }}" alt="{{ creature.nom }}">
+                                </div>
+                                <div class="stats-bar">
+                                    <span class="stats-badge">PV {{ creature.pvMax }}</span>
+                                    <span class="stats-badge">ATQ {{ creature.attaque }}</span>
+                                    <span class="stats-badge">DEF {{ creature.defens }}</span>
+                                </div>
+                            </button>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section class="combat-section">
+                    <h2 class="combat-title">2. Choisis une arene</h2>
+                    <div class="combat-arena-grid" id="combat-arenes">
+                        {% for arene in arenes %}
+                            <button type="button"
+                                    class="arena-card"
+                                    data-id="{{ arene.id }}"
+                                    data-image="{{ arene.imagePath }}">
+                                <div class="arena-image">
+                                    <img src="{{ asset('assets/' ~ arene.imagePath) }}" alt="{{ arene.nom }}">
+                                </div>
+                                <div class="arena-body">
+                                    <strong>{{ arene.nom }}</strong>
+                                    <span>{{ arene.inspiration }}</span>
+                                </div>
+                            </button>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <div class="combat-actions">
+                    <button type="submit" class="console-button" id="combat-submit" disabled>
+                        Demarrer le combat
+                        <span>ENTER</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/js/audio-player.js') }}" defer></script>
+    <script src="{{ asset('assets/js/combat-select.js') }}" defer></script>
+{% endblock %}
