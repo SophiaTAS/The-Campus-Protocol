@@ -5,10 +5,41 @@
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('assets/css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/home-intro.css') }}">
 {% endblock %}
 
 {% block body %}
-    <div class="page">
+    <script>
+        (function() {
+            try {
+                if (window.localStorage.getItem('campus-intro-done') !== 'true') {
+                    document.body.classList.add('intro-active');
+                }
+            } catch (e) {
+                document.body.classList.add('intro-active');
+            }
+        })();
+    </script>
+    <div id="intro-screen" class="intro-screen" aria-hidden="true">
+        <div class="intro-terminal">
+            <div class="intro-header">
+                <span>boot@campus-protocol</span>
+                <span>tty1</span>
+            </div>
+            <div class="intro-body">
+                <div id="intro-lines" class="intro-lines"></div>
+                <div id="intro-prompt" class="intro-prompt is-hidden">
+                    <div class="intro-question">Activer l'ambiance sonore (recommandé) ?</div>
+                    <div class="intro-actions">
+                        <button id="intro-yes" type="button" class="intro-btn intro-yes">Yes</button>
+                        <button id="intro-no" type="button" class="intro-btn intro-no">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="home-content" class="page">
         <div class="container">
             <section class="console-shell">
                 <div class="console-header">
@@ -40,5 +71,6 @@
 {% endblock %}
 
 {% block javascripts %}
+    <script src="{{ asset('assets/js/home-intro.js') }}" defer></script>
     <script src="{{ asset('assets/js/audio-player.js') }}" defer></script>
 {% endblock %}

@@ -40,4 +40,31 @@ class CreatureRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * @param array<int, int> $ids
+     * @return array<int, Creature>
+     */
+    public function findManyWithAttaquesAndType(array $ids): array
+    {
+        if (!$ids) {
+            return [];
+        }
+
+        $results = $this->createQueryBuilder('c')
+            ->addSelect('t', 'a')
+            ->leftJoin('c.type', 't')
+            ->leftJoin('c.attaques', 'a')
+            ->where('c.id IN (:ids)')
+            ->setParameter('ids', array_values($ids))
+            ->getQuery()
+            ->getResult();
+
+        $map = [];
+        foreach ($results as $creature) {
+            $map[$creature->getId()] = $creature;
+        }
+
+        return $map;
+    }
 }

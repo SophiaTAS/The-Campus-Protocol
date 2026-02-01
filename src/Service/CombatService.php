@@ -46,6 +46,34 @@ class CombatService
                 ],
                 'effet_visuel' => null,
             ],
+            'cache' => [
+                'joueur' => [
+                    'id' => $joueur->getId(),
+                    'nom' => $joueur->getNom(),
+                    'image' => $joueur->getImage(),
+                    'pvMax' => $joueur->getPvMax(),
+                    'attaque' => $joueur->getAttaque(),
+                    'defense' => $joueur->getDefens(),
+                    'type' => [
+                        'nom' => $joueur->getType()?->getNom(),
+                        'icone' => $joueur->getType()?->getIcone(),
+                        'couleur' => $joueur->getType()?->getCouleur(),
+                    ],
+                ],
+                'adversaire' => [
+                    'id' => $adversaire->getId(),
+                    'nom' => $adversaire->getNom(),
+                    'image' => $adversaire->getImage(),
+                    'pvMax' => $adversaire->getPvMax(),
+                    'attaque' => $adversaire->getAttaque(),
+                    'defense' => $adversaire->getDefens(),
+                    'type' => [
+                        'nom' => $adversaire->getType()?->getNom(),
+                        'icone' => $adversaire->getType()?->getIcone(),
+                        'couleur' => $adversaire->getType()?->getCouleur(),
+                    ],
+                ],
+            ],
         ];
 
         $this->session->set("combat_$combatId", $combat);

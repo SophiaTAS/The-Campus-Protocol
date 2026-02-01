@@ -29,6 +29,7 @@
             <div class="tabs">
                 <button class="tab-button active" data-tab="creatures">Creatures</button>
                 <button class="tab-button" data-tab="arenes">Arenes</button>
+                <button class="tab-button" data-tab="musiques">Musiques</button>
             </div>
 
             <section class="tab-content active" id="creatures">
@@ -52,6 +53,37 @@
                     {% endfor %}
                 </div>
             </section>
+
+            <section class="tab-content" id="musiques">
+                <div class="music-panel">
+                    <div class="music-panel__header">
+                        <h2>Bibliotheque musicale</h2>
+                        <p>Ecoute les pistes du jeu directement depuis le bestiaire.</p>
+                    </div>
+                    {% if tracks is empty %}
+                        <p class="text-bestiaire">Aucune musique disponible.</p>
+                    {% else %}
+                        <ul class="music-list">
+                            {% for slug, path in tracks %}
+                                <li class="music-item">
+                                    <div class="music-info">
+                                        <span class="music-title">{{ slug|replace({'_':' ','-':' '})|title }}</span>
+                                        <span class="music-duration">--:--</span>
+                                    </div>
+                                    <div class="music-controls">
+                                        <button class="music-play" type="button" data-src="{{ asset(path) }}">
+                                        ▶ Ecouter
+                                        </button>
+                                        <div class="music-progress" data-src="{{ asset(path) }}">
+                                            <div class="music-progress__bar"></div>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </section>
         </div>
     </div>
 {% endblock %}
@@ -60,4 +92,5 @@
     <script src="{{ asset('assets/js/audio-player.js') }}" defer></script>
     <script src="{{ asset('assets/js/back-link.js') }}" defer></script>
     <script src="{{ asset('assets/js/bestiaire-tabs.js') }}" defer></script>
+    <script src="{{ asset('assets/js/bestiaire-music.js') }}" defer></script>
 {% endblock %}

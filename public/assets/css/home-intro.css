@@ -1,0 +1,117 @@
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  background: #020502;
+  color: #7cff8f;
+  font-family: "Courier New", monospace;
+  display: none;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.intro-active .intro-screen {
+  display: flex;
+}
+
+.intro-screen.is-visible {
+  display: flex;
+}
+
+.intro-terminal {
+  width: min(920px, 95vw);
+  background: #040d07;
+  border: 1px solid #0f2f1c;
+  box-shadow: 0 0 24px rgba(76, 255, 143, 0.12);
+}
+
+.intro-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #0f2f1c;
+  background: #06140c;
+  color: #a2ffb4;
+  text-transform: lowercase;
+  font-size: 0.85rem;
+}
+
+.intro-body {
+  padding: 16px 18px 24px;
+}
+
+.intro-lines {
+  min-height: 260px;
+  display: grid;
+  gap: 6px;
+  font-size: 0.95rem;
+}
+
+.intro-line {
+  opacity: 0;
+  animation: intro-line 0.2s ease forwards;
+}
+
+@keyframes intro-line {
+  to { opacity: 1; }
+}
+
+.intro-prompt {
+  margin-top: 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.intro-question {
+  color: #caffd5;
+  letter-spacing: 0.04em;
+}
+
+.intro-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.intro-btn {
+  background: #0e2f1b;
+  border: 1px solid #1c5f36;
+  color: #caffd5;
+  padding: 8px 18px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.intro-btn:hover {
+  background: #133d24;
+}
+
+.intro-yes {
+  border-color: #4cff8f;
+  color: #4cff8f;
+}
+
+.intro-no {
+  border-color: #ff6f6f;
+  color: #ff6f6f;
+}
+
+.intro-prompt.is-hidden {
+  display: none;
+}
+
+.intro-active {
+  overflow: hidden;
+}
+
+.intro-active #audio-toggle {
+  display: none;
+}
+
+.intro-active #home-content {
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}

@@ -1,0 +1,299 @@
+.combat-arene {
+  background-size: cover;
+  background-position: center;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 95vh;
+  box-sizing: border-box;
+}
+
+.combat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #184126;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+}
+
+.combat-zone {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  height: 100%;
+}
+
+.creature-carte {
+  background: rgba(0, 0, 0, 0.88);
+  color: white;
+  border: 2px solid #1d3b27;
+  border-radius: 12px;
+  padding: 20px;
+  width: 280px;
+  box-shadow: 0 0 10px rgb(45, 206, 17);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.creature-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  background: white;
+  margin-bottom: 12px;
+}
+
+.creature-type {
+  color: var(--color-muted);
+  margin: 0 0 8px;
+}
+
+.combat-log-container {
+  background: rgba(0, 0, 0, 0.88);
+  border: 2px solid #1d3b27;
+  color: rgb(45, 206, 17);
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  padding: 0;
+  width: 100%;
+  max-width: 600px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0 2px #0c160f, inset 0 0 0 1px #000;
+}
+
+.combat-log-header {
+  background: rgba(0, 0, 0, 0.88);
+  color: rgb(45, 206, 17);
+  padding: 6px 10px;
+  font-weight: bold;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid #111;
+  box-shadow: inset 0 -1px 0 #000;
+}
+
+.combat-log-body {
+  padding: 10px;
+  overflow-y: auto;
+  flex-grow: 1;
+  line-height: 1.4;
+}
+
+.combat-log-body p {
+  margin: 0;
+  padding: 2px 0;
+}
+
+.barre-vie-container {
+  width: 100%;
+  height: 14px;
+  background-color: #444;
+  border: 1px solid #222;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.barre-vie {
+  height: 100%;
+  transition: width 0.4s ease;
+  border-radius: 6px;
+}
+
+.barre-vie.green {
+  background: linear-gradient(to right, #00e676, #43a047);
+}
+
+.barre-vie.orange {
+  background: linear-gradient(to right, #ffeb3b, #fbc02d);
+}
+
+.barre-vie.red {
+  background: linear-gradient(to right, #f44336, #b71c1c);
+}
+
+.pv-numerique {
+  font-size: 12px;
+  color: #ccc;
+  margin-top: 2px;
+}
+
+.barre-stats-container {
+  width: 100%;
+  height: 10px;
+  background-color: #333;
+  border: 1px solid #111;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.barre-stats {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.barre-stats.attaque {
+  background: linear-gradient(to right, #ff9800, #ffb74d);
+}
+
+.barre-stats.defense {
+  background: linear-gradient(to right, #2196f3, #64b5f6);
+}
+
+.stats-numerique {
+  font-size: 12px;
+  color: #ccc;
+  margin-top: 2px;
+}
+
+.stat-atq-def {
+  width: 100%;
+  text-align: center;
+}
+
+.attaque-list {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.attaque-list h4 {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+
+.btn-attaque {
+  display: block;
+  width: 100%;
+  background-color: #ffd700;
+  color: #111;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+  font-size: 13px;
+  border: 2px solid #555;
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin-bottom: 6px;
+  box-shadow: inset 0 -2px 0 #b8860b, 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.btn-attaque:hover {
+  background-color: #ffee32;
+  color: #000;
+  border-color: #999;
+  box-shadow: inset 0 -2px 0 #aaa, 0 0 8px 2px rgba(255, 255, 0, 0.3);
+  transform: scale(1.03);
+}
+
+.btn-attaque.is-waiting {
+  background-color: #1a1a1a;
+  color: #c5f7c5;
+  border-color: #2a6f3a;
+  box-shadow: none;
+  transform: none;
+  cursor: wait;
+}
+
+.btn-attaque.is-waiting span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 255, 102, 0.3);
+  border-top-color: #00ff66;
+  animation: spin 0.8s linear infinite;
+}
+
+.btn-attaque:active {
+  background-color: #e6c200;
+  box-shadow: inset 0 2px 4px #888;
+  transform: scale(0.98);
+}
+
+.attaque-form {
+  display: grid;
+  gap: 6px;
+}
+
+@keyframes glow-subtle {
+  0% { box-shadow: 0 0 0 transparent; }
+  50% { box-shadow: 0 0 12px 4px var(--glow-color); }
+  100% { box-shadow: 0 0 0 transparent; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.effet-x2 {
+  animation: glow-subtle 0.8s ease-in-out;
+  --glow-color: #ffc107;
+  border: 2px solid #ffc107;
+}
+
+.effet-x05 {
+  animation: glow-subtle 1.2s ease-in-out;
+  --glow-color: #64b5f6;
+  border: 2px solid #64b5f6;
+}
+
+.attaque-empty {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.statuts {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.badge-statut {
+  background-color: #222;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 14px;
+  color: #eee;
+}
+
+@media (max-width: 1100px) {
+  .combat-zone {
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+  }
+
+  .combat-log-container {
+    max-width: 100%;
+  }
+}

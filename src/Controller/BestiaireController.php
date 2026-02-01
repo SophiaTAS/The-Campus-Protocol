@@ -18,6 +18,7 @@ final class BestiaireController extends AbstractController
             'creatures' => $creatures->findAllWithType(),
             'arenes' => $arenes->findAll(),
             'music' => $musicLibrary->getTrackPath('bestiaire'),
+            'tracks' => $musicLibrary->getTracks(),
         ]);
     }
 }

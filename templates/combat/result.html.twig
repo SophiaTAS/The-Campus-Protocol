@@ -1,0 +1,52 @@
+{% set music = victoire
+    ? asset('assets/audio/musique/Victoire.mp3')
+    : (defaite
+        ? asset('assets/audio/musique/Defaite.mp3')
+        : asset('assets/audio/musique/Match_nul.mp3')) %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Resultat du combat | Campus Protocol{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/variables.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/resultat.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="resultat-combat">
+        {% if victoire %}
+            <h1 class="resultat-title victoire">🏆 Victoire !</h1>
+            <p>Tu as vaincu {{ adversaire.nom }}.</p>
+        {% elseif defaite %}
+            <h1 class="resultat-title defaite">💀 Defaite...</h1>
+            <p>{{ adversaire.nom }} t'a mis K.O.</p>
+        {% else %}
+            <h1 class="resultat-title nul">⚠️ Fin du combat</h1>
+            <p>Combat termine sans vainqueur.</p>
+        {% endif %}
+
+        <div class="resultat-images">
+            <div class="creature-resultat {{ victoire ? 'victorieuse' : (defaite ? 'ko' : '') }}">
+                {% set imageJoueur = victoire ? 'assets/img/creature/victoire/' ~ joueur.nom ~ '.png' : (defaite ? 'assets/img/creature/defaite/' ~ joueur.nom ~ '.png' : joueur.image) %}
+                <img src="{{ asset(imageJoueur) }}" alt="{{ joueur.nom }}">
+                <p>{{ joueur.nom }}</p>
+            </div>
+
+            <div class="creature-resultat {{ defaite ? 'victorieuse' : (victoire ? 'ko' : '') }}">
+                {% set imageAdv = defaite ? 'assets/img/creature/victoire/' ~ adversaire.nom ~ '.png' : (victoire ? 'assets/img/creature/defaite/' ~ adversaire.nom ~ '.png' : adversaire.image) %}
+                <img src="{{ asset(imageAdv) }}" alt="{{ adversaire.nom }}">
+                <p>{{ adversaire.nom }}</p>
+            </div>
+        </div>
+
+        <div class="actions-retour">
+            <a href="{{ path('app_combat') }}" class="btn btn-warning">🔁 Rejouer</a>
+            <a href="{{ path('app_home') }}" class="btn btn-secondary">🏠 Retour accueil</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/js/audio-player.js') }}" defer></script>
+{% endblock %}

@@ -7,9 +7,24 @@ use App\Repository\StatutEffetRepository;
 
 class StatutEffetService
 {
+    /** @var array<int, \App\Entity\StatutEffet> */
+    private array $statutCache = [];
+
     public function __construct(
         private StatutEffetRepository $statutEffetRepository,
     ) {}
+
+    private function getStatut(int $id): ?\App\Entity\StatutEffet
+    {
+        if (isset($this->statutCache[$id])) {
+            return $this->statutCache[$id];
+        }
+        $statut = $this->statutEffetRepository->find($id);
+        if ($statut) {
+            $this->statutCache[$id] = $statut;
+        }
+        return $statut;
+    }
 
     public function appliquerStatut(array &$combat, string $camp, int $statutId): void
     {
@@ -19,7 +34,7 @@ class StatutEffetService
 
         foreach ($combat['etat']['statuts'][$camp] as &$effet) {
             if (($effet['id'] ?? null) === $statutId) {
-                $statut = $this->statutEffetRepository->find($statutId);
+            $statut = $this->getStatut($statutId);
                 if ($statut) {
                     $effet['restant'] = $statut->getDuree();
                 }
@@ -29,7 +44,7 @@ class StatutEffetService
         }
         unset($effet);
 
-        $statut = $this->statutEffetRepository->find($statutId);
+        $statut = $this->getStatut($statutId);
         if (!$statut) {
             return;
         }
@@ -52,7 +67,7 @@ class StatutEffetService
                 continue;
             }
 
-            $statut = $this->statutEffetRepository->find($statutData['id']);
+            $statut = $this->getStatut($statutData['id']);
             if (!$statut) {
                 continue;
             }
@@ -101,7 +116,7 @@ class StatutEffetService
             if (!isset($statutData['id'])) {
                 continue;
             }
-            $statut = $this->statutEffetRepository->find($statutData['id']);
+            $statut = $this->getStatut($statutData['id']);
             if ($statut && $statut->getTypeEffet() === 'paralyse_logicielle' && ($statutData['restant'] ?? 0) > 0) {
                 return true;
             }
@@ -119,7 +134,7 @@ class StatutEffetService
             if (!isset($effetData['id'])) {
                 continue;
             }
-            $effet = $this->statutEffetRepository->find($effetData['id']);
+            $effet = $this->getStatut($effetData['id']);
             if (!$effet) {
                 continue;
             }

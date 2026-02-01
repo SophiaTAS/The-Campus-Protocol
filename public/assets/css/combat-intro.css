@@ -1,0 +1,117 @@
+.modal-casier {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content.intro-content {
+  background-color: #111;
+  color: #eee;
+  padding: 3em;
+  max-width: 900px;
+  border-radius: 16px;
+  border: 3px solid #00ffcc;
+  text-align: center;
+  box-shadow: 0 0 30px #00ffcc;
+  animation: apparition-objet 1s ease-out;
+}
+
+.versus-title {
+  font-size: 2.5em;
+  margin-bottom: 2em;
+  text-shadow: 0 0 10px #00ffcc;
+  font-weight: bold;
+}
+
+.versus-cartes {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 2em;
+  position: relative;
+}
+
+.carte-intro {
+  opacity: 0;
+  transform: scale(0.8) translateY(50px);
+  animation: entreeCarte 0.8s ease-out forwards;
+}
+
+.carte-intro.gauche {
+  animation-delay: 0.5s;
+}
+
+.carte-intro.droite {
+  animation-delay: 0.8s;
+}
+
+.carte-intro img {
+  height: 180px;
+  width: auto;
+  border-radius: 12px;
+  box-shadow: 0 0 15px #fff;
+  background-color: #000;
+  padding: 10px;
+}
+
+.nom-intro {
+  margin-top: 10px;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.vs-label {
+  font-size: 3em;
+  color: #00ffcc;
+  font-weight: bold;
+  text-shadow: 0 0 20px #00ffcc;
+  animation: scaleExplosif 1.2s ease-out forwards;
+  opacity: 0;
+  animation-delay: 0.9s;
+}
+
+.btn-start-combat {
+  background-color: #00ffcc;
+  color: #111;
+  padding: 12px 24px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-start-combat:hover {
+  background-color: #1cffdc;
+}
+
+@keyframes scaleExplosif {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-10deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5) rotate(5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes entreeCarte {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

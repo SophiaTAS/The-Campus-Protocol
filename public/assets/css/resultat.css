@@ -1,0 +1,91 @@
+.resultat-combat {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 32px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid #00ff66;
+  border-radius: 12px;
+  box-shadow: 0 0 24px rgba(0, 255, 102, 0.25);
+  text-align: center;
+  color: #e6ffe6;
+}
+
+.resultat-title {
+  margin-bottom: 12px;
+  font-size: 32px;
+  text-shadow: 0 0 12px rgba(0, 255, 102, 0.5);
+}
+
+.resultat-title.victoire {
+  color: #00ff88;
+}
+
+.resultat-title.defaite {
+  color: #ff5c5c;
+}
+
+.resultat-title.nul {
+  color: #ffd966;
+}
+
+.resultat-images {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+
+.creature-resultat {
+  width: 220px;
+  background: rgba(10, 10, 10, 0.9);
+  border: 1px solid #00ff66;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 0 16px rgba(0, 255, 102, 0.2);
+}
+
+.creature-resultat img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #000;
+}
+
+.creature-resultat.ko {
+  opacity: 0.6;
+  filter: grayscale(0.7);
+}
+
+.creature-resultat.victorieuse {
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+}
+
+.actions-retour {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.actions-retour .btn {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid #111;
+}
+
+.actions-retour .btn-warning {
+  background: #ffcc00;
+  color: #111;
+}
+
+.actions-retour .btn-secondary {
+  background: #222;
+  color: #e6ffe6;
+  border-color: #00ff66;
+}

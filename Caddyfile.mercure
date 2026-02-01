@@ -1,0 +1,25 @@
+{
+  auto_https off
+}
+
+:3000 {
+  @options method OPTIONS
+  respond @options 204
+
+  header {
+    Access-Control-Allow-Origin "*"
+    Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers "*"
+  }
+
+  mercure {
+    transport bolt {
+      path ./mercure.db
+    }
+    publisher_jwt ChangeThisMercureHubJWTSecretKey
+    subscriber_jwt ChangeThisMercureHubJWTSecretKey
+    cors_allowed_origins *
+    publish_allowed_origins *
+    anonymous
+  }
+}
