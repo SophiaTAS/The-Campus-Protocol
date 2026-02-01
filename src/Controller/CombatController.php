@@ -296,6 +296,9 @@ final class CombatController extends AbstractController
         $combatFini = $matchNul || $victoire || $defaite;
 
         $musicSlug = pathinfo((string) $arene->getImagePath(), PATHINFO_FILENAME);
+        $projectDir = (string) $this->getParameter('kernel.project_dir');
+        $resultImageJoueur = $this->resolveResultImage($joueur->getNom(), (string) $joueur->getImage(), $projectDir);
+        $resultImageAdv = $this->resolveResultImage($adversaire->getNom(), (string) $adversaire->getImage(), $projectDir);
 
         $data = [
             'combatId' => $id,
@@ -315,6 +318,8 @@ final class CombatController extends AbstractController
             'matchNul' => $matchNul,
             'resultUrl' => $this->generateUrl('app_combat_result', ['id' => $id]),
             'music' => $musicLibrary->getTrackPath($musicSlug) ?? $musicLibrary->getTrackPath('melancolie2'),
+            'resultImageJoueur' => $resultImageJoueur,
+            'resultImageAdv' => $resultImageAdv,
         ];
 
         if (isset($combat['cache']['joueur'])) {
@@ -325,5 +330,39 @@ final class CombatController extends AbstractController
         }
 
         return $data;
+    }
+
+    private function resolveResultImage(string $nom, string $baseImage, string $projectDir): array
+    {
+        $ext = pathinfo($baseImage, PATHINFO_EXTENSION) ?: 'png';
+        $baseName = pathinfo($baseImage, PATHINFO_FILENAME);
+
+        $candidates = [];
+        $candidates[] = $baseName . '.' . $ext;
+        $candidates[] = ucfirst($baseName) . '.' . $ext;
+
+        $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nom) ?: $nom;
+        $ascii = preg_replace('/[^A-Za-z0-9\\-]/', '', $ascii);
+        if ($ascii !== '') {
+            $candidates[] = $ascii . '.' . $ext;
+            $candidates[] = strtolower($ascii) . '.' . $ext;
+        }
+
+        $candidates = array_values(array_unique($candidates));
+
+        $variants = [];
+        foreach (['victoire', 'defaite'] as $variant) {
+            $variants[$variant] = null;
+            foreach ($candidates as $file) {
+                $relative = '/assets/img/creature/' . $variant . '/' . $file;
+                $fullPath = $projectDir . '/public' . $relative;
+                if (is_file($fullPath)) {
+                    $variants[$variant] = $relative;
+                    break;
+                }
+            }
+        }
+
+        return $variants;
     }
 }

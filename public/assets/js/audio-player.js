@@ -1,5 +1,4 @@
 const STORAGE_KEY = 'campus-audio-enabled';
-const TIME_KEY = 'campus-audio-time';
 const FADE_MS = 650;
 
 const isEnabled = () => {
@@ -23,11 +22,14 @@ const initAudioPlayer = () => {
     return;
   }
 
-  const audio = new Audio(src);
-  audio.loop = true;
-  audio.preload = 'auto';
-  window.campusBgm = audio;
-  audio.volume = 0;
+  let audio = window.campusBgm;
+  if (!audio) {
+    audio = new Audio(src);
+    audio.loop = true;
+    audio.preload = 'auto';
+    window.campusBgm = audio;
+    audio.volume = 0;
+  }
 
   const updateButton = (enabled) => {
     toggle.setAttribute('aria-pressed', String(enabled));
@@ -60,10 +62,6 @@ const initAudioPlayer = () => {
       audio.pause();
       return;
     }
-    const savedTime = Number(window.localStorage.getItem(TIME_KEY));
-    if (Number.isFinite(savedTime) && savedTime > 0) {
-      audio.currentTime = savedTime;
-    }
     audio.play()
       .then(() => fadeTo(1))
       .catch(() => {
@@ -73,27 +71,23 @@ const initAudioPlayer = () => {
 
   tryPlay();
 
-  toggle.addEventListener('click', () => {
-    enabled = !enabled;
-    setEnabled(enabled);
-    updateButton(enabled);
-    tryPlay();
-  });
-
-  const rememberTime = () => {
-    if (!audio.paused && Number.isFinite(audio.currentTime)) {
-      window.localStorage.setItem(TIME_KEY, String(audio.currentTime));
-    }
-  };
+  if (toggle.dataset.audioBound !== 'true') {
+    toggle.addEventListener('click', () => {
+      enabled = !enabled;
+      setEnabled(enabled);
+      updateButton(enabled);
+      tryPlay();
+    });
+    toggle.dataset.audioBound = 'true';
+  }
 
   window.addEventListener('pagehide', () => {
     if (!audio.paused) {
-      rememberTime();
       fadeTo(0);
     }
   });
-
-  window.addEventListener('beforeunload', rememberTime);
 };
 
+window.initAudioPlayer = initAudioPlayer;
 document.addEventListener('DOMContentLoaded', initAudioPlayer);
+document.addEventListener('turbo:load', initAudioPlayer);

@@ -53,6 +53,35 @@
   animation: intro-line 0.2s ease forwards;
 }
 
+.intro-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #caffd5;
+}
+
+.intro-loader__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4cff8f;
+  box-shadow: 0 0 6px rgba(76, 255, 143, 0.6);
+  animation: loader-pulse 1s infinite ease-in-out;
+}
+
+.intro-loader__dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.intro-loader__dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes loader-pulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
 @keyframes intro-line {
   to { opacity: 1; }
 }

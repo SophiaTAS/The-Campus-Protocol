@@ -28,13 +28,13 @@
 
         <div class="resultat-images">
             <div class="creature-resultat {{ victoire ? 'victorieuse' : (defaite ? 'ko' : '') }}">
-                {% set imageJoueur = victoire ? 'assets/img/creature/victoire/' ~ joueur.nom ~ '.png' : (defaite ? 'assets/img/creature/defaite/' ~ joueur.nom ~ '.png' : joueur.image) %}
+                {% set imageJoueur = victoire ? (resultImageJoueur.victoire ?? joueur.image) : (defaite ? (resultImageJoueur.defaite ?? joueur.image) : joueur.image) %}
                 <img src="{{ asset(imageJoueur) }}" alt="{{ joueur.nom }}">
                 <p>{{ joueur.nom }}</p>
             </div>
 
             <div class="creature-resultat {{ defaite ? 'victorieuse' : (victoire ? 'ko' : '') }}">
-                {% set imageAdv = defaite ? 'assets/img/creature/victoire/' ~ adversaire.nom ~ '.png' : (victoire ? 'assets/img/creature/defaite/' ~ adversaire.nom ~ '.png' : adversaire.image) %}
+                {% set imageAdv = defaite ? (resultImageAdv.victoire ?? adversaire.image) : (victoire ? (resultImageAdv.defaite ?? adversaire.image) : adversaire.image) %}
                 <img src="{{ asset(imageAdv) }}" alt="{{ adversaire.nom }}">
                 <p>{{ adversaire.nom }}</p>
             </div>
