@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Arene;
 use App\Entity\Attaque;
 use App\Entity\Creature;
 use App\Entity\StatutEffet;
@@ -151,6 +152,28 @@ class AppFixtures extends Fixture
                 ->setTypeCible($typeById[$data['type_cible_id']])
                 ->setMultiplicateur($data['multiplicateur']);
             $manager->persist($multiplicateur);
+        }
+
+        $arenes = [
+            ['nom' => 'Le Hall de l\'Anti-Aliasing', 'inspiration' => 'Nintendo 64', 'style' => 'Réaliste', 'image_path' => 'img/arene/GoldenTurok.png'],
+            ['nom' => 'Zone Blast Processing', 'inspiration' => 'Mega Drive', 'style' => 'Réaliste', 'image_path' => 'img/arene/Green_Hill_Night.png'],
+            ['nom' => 'Le Hub VMU', 'inspiration' => 'Dreamcast', 'style' => 'Réaliste', 'image_path' => 'img/arene/HUB_VMU.png'],
+            ['nom' => 'La Baie des Transparences', 'inspiration' => 'Saturn', 'style' => 'Réaliste', 'image_path' => 'img/arene/Nights_into_Matrix.png'],
+            ['nom' => 'La Forêt Woodgrain', 'inspiration' => 'Atari 2600', 'style' => 'Réaliste', 'image_path' => 'img/arene/Pitfall_Nightmare.png'],
+            ['nom' => 'Le Donjon Guru Meditation', 'inspiration' => 'Amiga 500', 'style' => 'Réaliste', 'image_path' => 'img/arene/Shadow_of_the_Beast.png'],
+            ['nom' => 'La Place de la Spirale', 'inspiration' => 'Dreamcast', 'style' => 'Réaliste', 'image_path' => 'img/arene/Sonic_adventure_dream.png'],
+            ['nom' => 'Le Labo System 16', 'inspiration' => 'Arcade Sega', 'style' => 'Réaliste', 'image_path' => 'img/arene/Systeme16_Arena.png'],
+            ['nom' => 'Le Palais Master System', 'inspiration' => 'Master System', 'style' => 'Réaliste', 'image_path' => 'img/arene/Wonder_Master_Kidd.png'],
+            ['nom' => 'La Dimension Glitched Famicom', 'inspiration' => 'GameBoy', 'style' => 'Réaliste', 'image_path' => 'img/arene/Zelda_beach.png'],
+        ];
+
+        foreach ($arenes as $data) {
+            $arene = (new Arene())
+                ->setNom($data['nom'])
+                ->setInspiration($data['inspiration'])
+                ->setStyle($data['style'])
+                ->setImagePath($data['image_path']);
+            $manager->persist($arene);
         }
 
         $manager->flush();

@@ -5,6 +5,7 @@
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('assets/css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/global.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/bestiaire.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -19,15 +20,37 @@
                 <p class="console-subtitle">
                     Catalogue des creatures du campus. Selectionne une carte pour lire les stats.
                 </p>
+                <button class="console-button" id="back-link" type="button">
+                    Retour
+                    <span>ESC</span>
+                </button>
             </section>
 
-            <section class="bestiaire-grid">
-                {% if creatures is empty %}
-                    <p class="text-bestiaire">Aucune creature debloquee pour le moment.</p>
-                {% endif %}
-                {% for creature in creatures %}
-                    {% include 'partials/_creature_card.html.twig' with { creature: creature } %}
-                {% endfor %}
+            <div class="tabs">
+                <button class="tab-button active" data-tab="creatures">Creatures</button>
+                <button class="tab-button" data-tab="arenes">Arenes</button>
+            </div>
+
+            <section class="tab-content active" id="creatures">
+                <div class="bestiaire-grid">
+                    {% if creatures is empty %}
+                        <p class="text-bestiaire">Aucune creature debloquee pour le moment.</p>
+                    {% endif %}
+                    {% for creature in creatures %}
+                        {% include 'partials/_creature_card.html.twig' with { creature: creature } %}
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="tab-content" id="arenes">
+                <div class="bestiaire-grid">
+                    {% if arenes is empty %}
+                        <p class="text-bestiaire">Aucune arene debloquee pour le moment.</p>
+                    {% endif %}
+                    {% for arene in arenes %}
+                        {% include 'partials/_arene_card.html.twig' with { arene: arene } %}
+                    {% endfor %}
+                </div>
             </section>
         </div>
     </div>
@@ -35,4 +58,6 @@
 
 {% block javascripts %}
     <script src="{{ asset('assets/js/audio-player.js') }}" defer></script>
+    <script src="{{ asset('assets/js/back-link.js') }}" defer></script>
+    <script src="{{ asset('assets/js/bestiaire-tabs.js') }}" defer></script>
 {% endblock %}

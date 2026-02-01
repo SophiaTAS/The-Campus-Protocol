@@ -1,0 +1,13 @@
+<article class="card arene-card">
+    <div class="card-image full">
+        <img src="{{ asset('assets/' ~ arene.imagePath) }}" alt="{{ arene.nom }}">
+    </div>
+    <div class="arene-card__body">
+        <strong class="arene-card__title">{{ arene.nom }}</strong>
+        <div class="arene-card__meta">
+            {% if arene.inspiration %}
+            <span>{{ arene.inspiration }}</span>
+            {% endif %}
+        </div>
+    </div>
+</article>
