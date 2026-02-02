@@ -24,11 +24,16 @@ if exist "%ROOT%php\php.exe" (
 
 :php_missing
 echo PHP not found. Downloading a local PHP runtime...
-set "PHP_URL=https://windows.php.net/downloads/releases/php-8.1.13-Win32-vs16-x64.zip"
+set "PHP_URL=https://windows.php.net/downloads/releases/latest/php-8.1-Win32-vs16-x64-latest.zip"
 set "PHP_ZIP=%ROOT%php.zip"
 set "PHP_DIR=%ROOT%php"
 
-powershell -NoProfile -Command "Invoke-WebRequest -Uri '%PHP_URL%' -OutFile '%PHP_ZIP%'"
+where curl >nul 2>&1
+if %errorlevel%==0 (
+  curl -L -o "%PHP_ZIP%" "%PHP_URL%"
+) else (
+  powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%PHP_URL%' -OutFile '%PHP_ZIP%' -UseBasicParsing -MaximumRedirection 10;"
+)
 if not exist "%PHP_ZIP%" (
   echo [ERROR] PHP download failed. Please install PHP or place it in .\php\
   exit /b 1
