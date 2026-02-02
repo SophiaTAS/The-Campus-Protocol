@@ -15,7 +15,7 @@ const initHomeIntro = () => {
   intro.dataset.introBound = 'true';
 
   const PREF_KEY = 'campus-audio-enabled';
-  const INTRO_KEY = 'campus-intro-done';
+  const INTRO_KEY = 'campus-intro-done-v2';
   const saved = window.localStorage.getItem(INTRO_KEY);
 
   const finishIntro = (enableAudio) => {

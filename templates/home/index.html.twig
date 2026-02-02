@@ -12,7 +12,7 @@
     <script>
         (function() {
             try {
-                if (window.localStorage.getItem('campus-intro-done') !== 'true') {
+                if (window.localStorage.getItem('campus-intro-done-v2') !== 'true') {
                     document.body.classList.add('intro-active');
                 }
             } catch (e) {
@@ -29,7 +29,7 @@
             <div class="intro-body">
                 <div id="intro-lines" class="intro-lines"></div>
                 <div id="intro-prompt" class="intro-prompt is-hidden">
-                    <div class="intro-question">Activer l'ambiance sonore (recommandé) ?</div>
+                    <div class="intro-question">Activer l'ambiance sonore (recommande) ?</div>
                     <div class="intro-actions">
                         <button id="intro-yes" type="button" class="intro-btn intro-yes">Yes</button>
                         <button id="intro-no" type="button" class="intro-btn intro-no">No</button>

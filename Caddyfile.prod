@@ -1,0 +1,18 @@
+{
+  auto_https off
+}
+
+:3000 {
+  root * {env.ROOT_DIR}/public
+  encode gzip
+  php_fastcgi 127.0.0.1:9000
+  file_server
+
+  mercure {
+    publisher_jwt {env.MERCURE_JWT_SECRET}
+    subscriber_jwt {env.MERCURE_JWT_SECRET}
+    anonymous
+    cors_allowed_origins *
+    publish_allowed_origins *
+  }
+}
