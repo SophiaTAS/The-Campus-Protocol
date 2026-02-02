@@ -101,7 +101,7 @@ exit /b 1
 
 :start_php_cgi
 echo Demarrage de PHP-CGI...
-start "PHP-CGI (NE PAS FERMER)" cmd /k "\"%PHP_CGI%\" -b 127.0.0.1:9000"
+start "PHP-CGI (NE PAS FERMER)" cmd /k ""%PHP_CGI%" -b 127.0.0.1:9000"
 exit /b 0
 
 :start_mercure
@@ -116,7 +116,7 @@ if not exist "%ROOT%Caddyfile.prod" (
   pause
   exit /b 1
 )
-start "Caddy/Mercure (NE PAS FERMER)" cmd /k "set ROOT_DIR=%ROOT_DIR%&&set MERCURE_JWT_SECRET=%MERCURE_JWT_SECRET%&&\"%ROOT%mercure.exe\" run --config \"%ROOT%Caddyfile.prod\""
+start "Caddy/Mercure (NE PAS FERMER)" cmd /k "set ROOT_DIR=%ROOT_DIR%& set MERCURE_JWT_SECRET=%MERCURE_JWT_SECRET%& ""%ROOT%mercure.exe"" run --config ""%ROOT%Caddyfile.prod"""
 exit /b 0
 
 :fail_db
