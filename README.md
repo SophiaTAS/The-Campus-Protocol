@@ -49,9 +49,9 @@ Optionnel (recommande) :
 1. Cloner le depot.
 2. Ouvrir un terminal dans le dossier du projet.
 3. Installer les dependances et verifier l'environnement :
-   - `setup.bat`
+   - `.\setup.bat`
 4. Lancer l'application (prod local) :
-   - `run-prod.bat`
+   - `.\run-prod.bat`
 
 `run-prod.bat` recrée la base SQLite, lance les migrations, injecte les donnees, puis demarre PHP-CGI et Mercure/Caddy.
 
