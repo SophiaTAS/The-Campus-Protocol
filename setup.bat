@@ -76,11 +76,11 @@ if "%COMPOSER_BIN%"=="" if "%COMPOSER_PHAR%"=="" (
 echo Composer OK.
 
 echo.
-echo [3/5] Installing PHP dependencies...
+echo [3/5] Installation des dependances PHP...
 if not "%COMPOSER_BIN%"=="" (
-  %COMPOSER_BIN% install --no-interaction --prefer-dist
+  call %COMPOSER_BIN% install --no-interaction --prefer-dist
 ) else (
-  %PHP_BIN% "%COMPOSER_PHAR%" install --no-interaction --prefer-dist
+  call %PHP_BIN% "%COMPOSER_PHAR%" install --no-interaction --prefer-dist
 )
 if %errorlevel% neq 0 (
   echo [ERROR] Composer install failed.
@@ -88,7 +88,7 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [4/5] Checking database file...
+echo [4/5] Verification de la base...
 set "DB_PATH=%ROOT%var\data.db"
 if not exist "%ROOT%var" mkdir "%ROOT%var"
 
@@ -96,13 +96,13 @@ if exist "%DB_PATH%" (
   echo Database found: %DB_PATH%
 ) else (
   echo Database not found: %DB_PATH%
-  set /p RUN_DB="Run migrations + seed now? (y/N): "
-  if /i "!RUN_DB!"=="y" (
+  set /p RUN_DB="Lancer migrations + seed maintenant ? (o/N): "
+  if /i "!RUN_DB!"=="o" (
     del /f /q "%DB_PATH%" >nul 2>&1
     copy /y NUL "%DB_PATH%" >nul
-    %PHP_BIN% bin\console doctrine:migrations:migrate --env=prod --no-interaction
+    call %PHP_BIN% bin\console doctrine:migrations:migrate --env=prod --no-interaction
     if %errorlevel% neq 0 exit /b 1
-    %PHP_BIN% scripts\seed_sqlite.php
+    call %PHP_BIN% scripts\seed_sqlite.php
     if %errorlevel% neq 0 exit /b 1
   ) else (
     echo Skipped database setup.
@@ -110,12 +110,12 @@ if exist "%DB_PATH%" (
 )
 
 echo.
-echo [5/5] Done.
-set /p RUN_SERVERS="Launch the production servers now? (y/N): "
-if /i "!RUN_SERVERS!"=="y" (
+echo [5/5] Termine.
+set /p RUN_SERVERS="Lancer les serveurs maintenant ? (o/N): "
+if /i "!RUN_SERVERS!"=="o" (
   call "%ROOT%run-prod.bat"
 ) else (
-  echo You can start later with: run-prod.bat
+  echo Vous pouvez lancer plus tard avec: .\run-prod.bat
 )
 
 echo.

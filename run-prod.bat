@@ -5,11 +5,6 @@ if defined TRACE echo on
 set "ROOT=%~dp0"
 cd /d "%ROOT%"
 
-if /i "%~1" neq "stay" (
-  cmd /k "%~f0 stay"
-  exit /b
-)
-
 set "APP_ENV=prod"
 set "APP_DEBUG=0"
 set "ROOT_DIR=%ROOT%"
