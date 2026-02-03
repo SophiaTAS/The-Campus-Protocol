@@ -1,25 +1,60 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal EnableDelayedExpansion
 
 set "ROOT=%~dp0"
 cd /d "%ROOT%"
 
-echo === The Campus Protocol :: Setup ===
+set "PHP_DIR=%ROOT%php"
+set "PHP_BIN=%PHP_DIR%\php.exe"
+set "PHP_INI=%PHP_DIR%\php.ini"
+set "PHP_URL=https://windows.php.net/downloads/releases/latest/php-8.5-Win32-vs17-x64-latest.zip"
+set "PHP_ZIP=%ROOT%php.zip"
+set "COMPOSER_PHAR=%ROOT%composer.phar"
+
+call :print_header
 
 echo.
-echo [1/6] Checking PHP...
-set "PHP_BIN="
-set "PHP_DIR=%ROOT%php"
-if exist "%PHP_DIR%\php.exe" (
-  set "PHP_BIN=%PHP_DIR%\php.exe"
-  goto :php_found
-)
+call :confirm "[1/6] Telecharger PHP 8.5.x dans .\php\ (ecrase si existe)" || exit /b 1
+call :download_php || exit /b 1
 
-:php_missing
-echo PHP 8.5 not found locally. Downloading a local PHP runtime...
-set "PHP_URL=https://windows.php.net/downloads/releases/latest/php-8.5-Win32-vs16-x64-latest.zip"
-set "PHP_ZIP=%ROOT%php.zip"
-set "PHP_DIR=%ROOT%php"
+echo.
+call :confirm "[2/6] Configurer php.ini pour l'application" || exit /b 1
+call :configure_php_ini || exit /b 1
+
+echo.
+call :confirm "[3/6] Telecharger Composer (composer.phar)" || exit /b 1
+call :download_composer || exit /b 1
+
+echo.
+call :confirm "[4/6] Installer les dependances PHP (composer install)" || exit /b 1
+call :composer_install || exit /b 1
+
+echo.
+call :confirm "[5/6] Creer la base SQLite + migrations + seed" || exit /b 1
+call :setup_db || exit /b 1
+
+echo.
+call :confirm "[6/6] Lancer run-prod.bat" || exit /b 0
+call "%ROOT%run-prod.bat"
+
+echo.
+echo Setup finished.
+endlocal
+exit /b 0
+
+:print_header
+echo === The Campus Protocol :: Setup ===
+exit /b 0
+
+:confirm
+set "PROMPT=%~1"
+set /p CONFIRM="%PROMPT% (o/N): "
+if /i "%CONFIRM%"=="o" exit /b 0
+exit /b 1
+
+:download_php
+if exist "%PHP_DIR%" rmdir /s /q "%PHP_DIR%"
+if exist "%PHP_ZIP%" del /f /q "%PHP_ZIP%" >nul 2>&1
 
 where curl >nul 2>&1
 if %errorlevel%==0 (
@@ -27,127 +62,77 @@ if %errorlevel%==0 (
 ) else (
   powershell -NoProfile -Command "$ProgressPreference='SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%PHP_URL%' -OutFile '%PHP_ZIP%' -UseBasicParsing -MaximumRedirection 10;"
 )
+
 if not exist "%PHP_ZIP%" (
-  echo [ERROR] PHP download failed. Please install PHP or place it in .\php\
+  echo [ERROR] PHP download failed.
+  exit /b 1
+)
+
+for %%Z in ("%PHP_ZIP%") do set "PHP_ZIP_SIZE=%%~zZ"
+if %PHP_ZIP_SIZE% LSS 10000000 (
+  echo [ERROR] PHP download looks too small (%PHP_ZIP_SIZE% bytes).
   exit /b 1
 )
 
 powershell -NoProfile -Command "Expand-Archive -LiteralPath '%PHP_ZIP%' -DestinationPath '%PHP_DIR%'"
-del /f /q "%PHP_ZIP%" >nul 2>&1
-
-if not exist "%PHP_DIR%\php.exe" (
+if errorlevel 1 (
   echo [ERROR] PHP extraction failed.
   exit /b 1
 )
 
-if not exist "%PHP_DIR%\php.ini" (
-  set "PHP_TEMPLATE="
-  if exist "C:\wamp64\bin\php\php-8.5.2\php.ini" set "PHP_TEMPLATE=C:\wamp64\bin\php\php-8.5.2\php.ini"
-  if defined PHP_TEMPLATE (
-    copy /y "%PHP_TEMPLATE%" "%PHP_DIR%\php.ini" >nul
-  ) else (
-    if exist "%PHP_DIR%\php.ini-development" copy /y "%PHP_DIR%\php.ini-development" "%PHP_DIR%\php.ini" >nul
-  )
+if not exist "%PHP_BIN%" (
+  echo [ERROR] php.exe introuvable apres extraction.
+  exit /b 1
 )
 
-set "PHP_BIN=%PHP_DIR%\php.exe"
-
-:php_found
 echo PHP OK: %PHP_BIN%
-for /f "tokens=1,2" %%A in ('cmd /s /c ""%PHP_BIN%" -r "echo PHP_MAJOR_VERSION . ' ' . PHP_MINOR_VERSION;""') do (
-  set "PHP_MAJOR=%%A"
-  set "PHP_MINOR=%%B"
-)
-if %PHP_MAJOR% LSS 8 (
-  echo [ERROR] PHP 8.4+ is required for Symfony 8. Detected %PHP_MAJOR%.%PHP_MINOR%.
-  exit /b 1
-)
-if %PHP_MAJOR%==8 if %PHP_MINOR% LSS 4 (
-  echo [ERROR] PHP 8.4+ is required for Symfony 8. Detected %PHP_MAJOR%.%PHP_MINOR%.
-  exit /b 1
-)
+exit /b 0
 
-echo.
-echo [2/6] Checking PHP extensions...
-set "PHP_INI=%PHP_DIR%\php.ini"
+:configure_php_ini
 if not exist "%PHP_INI%" (
-  set "PHP_INI="
-  for /f "tokens=2,* delims=:" %%A in ('"%PHP_BIN%" --ini ^| findstr /i "Loaded Configuration File"') do (
-    set "PHP_INI=%%B"
-  )
-  set "PHP_INI=%PHP_INI:~1%"
-)
-if "%PHP_INI%"=="" (
-  echo [WARN] php.ini not found via --ini output.
-) else (
-  echo php.ini: %PHP_INI%
-)
-for /f %%M in ('"%PHP_BIN%" -m ^| findstr /i "pdo_sqlite"') do set "HAS_PDO_SQLITE=1"
-for /f %%M in ('"%PHP_BIN%" -m ^| findstr /i "sqlite3"') do set "HAS_SQLITE3=1"
-if not defined HAS_PDO_SQLITE (
-  if /i "%PHP_INI%"=="%ROOT%php\\php.ini" (
-    powershell -NoProfile -Command "(Get-Content '%ROOT%php\\php.ini') -replace '^;extension=pdo_sqlite','extension=pdo_sqlite' | Set-Content -Encoding ASCII '%ROOT%php\\php.ini'"
-    powershell -NoProfile -Command "(Get-Content '%ROOT%php\\php.ini') -replace '^;extension=sqlite3','extension=sqlite3' | Set-Content -Encoding ASCII '%ROOT%php\\php.ini'"
-    echo Enabled pdo_sqlite and sqlite3 in local php.ini.
+  if exist "%PHP_DIR%\php.ini-development" (
+    copy /y "%PHP_DIR%\php.ini-development" "%PHP_INI%" >nul
+  ) else if exist "%PHP_DIR%\php.ini-production" (
+    copy /y "%PHP_DIR%\php.ini-production" "%PHP_INI%" >nul
   ) else (
-    echo [WARN] pdo_sqlite extension is missing. Please enable it in %PHP_INI%.
+    echo [ERROR] Aucun template php.ini trouve.
+    exit /b 1
   )
 )
 
-echo.
-echo [3/6] Checking Composer...
-set "COMPOSER_BIN="
-set "COMPOSER_PHAR=%ROOT%composer.phar"
-if not exist "%COMPOSER_PHAR%" (
-  echo Composer not found locally. Downloading composer.phar...
-  powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://getcomposer.org/download/latest-stable/composer.phar' -OutFile '%ROOT%composer.phar'"
-)
+powershell -NoProfile -Command "(Get-Content '%PHP_INI%') -replace '^;extension=pdo_sqlite','extension=pdo_sqlite' | Set-Content -Encoding ASCII '%PHP_INI%'"
+powershell -NoProfile -Command "(Get-Content '%PHP_INI%') -replace '^;extension=sqlite3','extension=sqlite3' | Set-Content -Encoding ASCII '%PHP_INI%'"
+
+echo php.ini OK: %PHP_INI%
+exit /b 0
+
+:download_composer
+if exist "%COMPOSER_PHAR%" del /f /q "%COMPOSER_PHAR%" >nul 2>&1
+powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://getcomposer.org/download/latest-stable/composer.phar' -OutFile '%COMPOSER_PHAR%'"
 if not exist "%COMPOSER_PHAR%" (
   echo [ERROR] Composer download failed.
   exit /b 1
 )
 
-echo Composer OK.
+echo Composer OK: %COMPOSER_PHAR%
+exit /b 0
 
-echo.
-echo [4/6] Installation des dependances PHP...
-call %PHP_BIN% "%COMPOSER_PHAR%" install --no-interaction --prefer-dist
+:composer_install
+"%PHP_BIN%" "%COMPOSER_PHAR%" install --no-interaction --prefer-dist
 if %errorlevel% neq 0 (
   echo [ERROR] Composer install failed.
   exit /b 1
 )
+exit /b 0
 
-echo.
-echo [5/6] Verification de la base...
+:setup_db
 set "DB_PATH=%ROOT%var\data.db"
 if not exist "%ROOT%var" mkdir "%ROOT%var"
 
-if exist "%DB_PATH%" (
-  echo Database found: %DB_PATH%
-) else (
-  echo Database not found: %DB_PATH%
-  set /p RUN_DB="Lancer migrations + seed maintenant ? (o/N): "
-  if /i "!RUN_DB!"=="o" (
-    del /f /q "%DB_PATH%" >nul 2>&1
-    copy /y NUL "%DB_PATH%" >nul
-    call %PHP_BIN% bin\console doctrine:migrations:migrate --env=prod --no-interaction
-    if %errorlevel% neq 0 exit /b 1
-    call %PHP_BIN% scripts\seed_sqlite.php
-    if %errorlevel% neq 0 exit /b 1
-  ) else (
-    echo Skipped database setup.
-  )
-)
-
-echo.
-echo [6/6] Termine.
-set /p RUN_SERVERS="Lancer les serveurs maintenant ? (o/N): "
-if /i "!RUN_SERVERS!"=="o" (
-  call "%ROOT%run-prod.bat"
-) else (
-  echo Vous pouvez lancer plus tard avec: .\run-prod.bat
-)
-
-echo.
-echo Setup finished.
-endlocal
+del /f /q "%DB_PATH%" >nul 2>&1
+copy /y NUL "%DB_PATH%" >nul
+"%PHP_BIN%" bin\console doctrine:migrations:migrate --env=prod --no-interaction
+if %errorlevel% neq 0 exit /b 1
+"%PHP_BIN%" scripts\seed_sqlite.php
+if %errorlevel% neq 0 exit /b 1
+exit /b 0
