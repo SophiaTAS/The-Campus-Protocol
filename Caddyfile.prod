@@ -9,6 +9,8 @@
   file_server
 
   mercure {
+    transport_url bolt://{env.ROOT_DIR}/mercure.db
+
     publisher_jwt {env.MERCURE_JWT_SECRET}
     subscriber_jwt {env.MERCURE_JWT_SECRET}
     anonymous
