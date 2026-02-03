@@ -14,16 +14,9 @@ if exist "%PHP_DIR%\php.exe" (
   set "PHP_BIN=%PHP_DIR%\php.exe"
   goto :php_found
 )
-where php >nul 2>&1
-if %errorlevel%==0 (
-  for /f "delims=" %%P in ('where php') do (
-    set "PHP_BIN=%%P"
-    goto :php_found
-  )
-)
 
 :php_missing
-echo PHP not found. Downloading a local PHP runtime...
+echo PHP 8.5 not found locally. Downloading a local PHP runtime...
 set "PHP_URL=https://windows.php.net/downloads/releases/latest/php-8.5-Win32-vs16-x64-latest.zip"
 set "PHP_ZIP=%ROOT%php.zip"
 set "PHP_DIR=%ROOT%php"
@@ -104,22 +97,13 @@ if not defined HAS_PDO_SQLITE (
 echo.
 echo [3/6] Checking Composer...
 set "COMPOSER_BIN="
-set "COMPOSER_PHAR="
-where composer >nul 2>&1
-if %errorlevel%==0 (
-  set "COMPOSER_BIN=composer"
-) else (
-  if not exist "%ROOT%composer.phar" (
-    echo Composer not found. Downloading composer.phar...
-    powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://getcomposer.org/download/latest-stable/composer.phar' -OutFile '%ROOT%composer.phar'"
-  )
-  if exist "%ROOT%composer.phar" (
-    set "COMPOSER_PHAR=%ROOT%composer.phar"
-  )
+set "COMPOSER_PHAR=%ROOT%composer.phar"
+if not exist "%COMPOSER_PHAR%" (
+  echo Composer not found locally. Downloading composer.phar...
+  powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://getcomposer.org/download/latest-stable/composer.phar' -OutFile '%ROOT%composer.phar'"
 )
-
-if "%COMPOSER_BIN%"=="" if "%COMPOSER_PHAR%"=="" (
-  echo [ERROR] Composer is not available.
+if not exist "%COMPOSER_PHAR%" (
+  echo [ERROR] Composer download failed.
   exit /b 1
 )
 
@@ -127,11 +111,7 @@ echo Composer OK.
 
 echo.
 echo [4/6] Installation des dependances PHP...
-if not "%COMPOSER_BIN%"=="" (
-  call %COMPOSER_BIN% install --no-interaction --prefer-dist
-) else (
-  call %PHP_BIN% "%COMPOSER_PHAR%" install --no-interaction --prefer-dist
-)
+call %PHP_BIN% "%COMPOSER_PHAR%" install --no-interaction --prefer-dist
 if %errorlevel% neq 0 (
   echo [ERROR] Composer install failed.
   exit /b 1
