@@ -114,7 +114,7 @@ exit /b 1
 
 :start_php_cgi
 echo Demarrage de PHP-CGI...
-start "PHP-CGI (NE PAS FERMER)" cmd /k "set APP_ENV=prod&&set APP_DEBUG=0&&\"%PHP_CGI%\" -b 127.0.0.1:9000"
+start "PHP-CGI (NE PAS FERMER)" "%PHP_CGI%" -b 127.0.0.1:9000
 exit /b 0
 
 :start_mercure
