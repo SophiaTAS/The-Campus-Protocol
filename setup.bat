@@ -88,7 +88,9 @@ exit /b 0
 
 :configure_php_ini
 if not exist "%PHP_INI%" (
-  if exist "%PHP_DIR%\php.ini-development" (
+  if exist "%ROOT%php.ini.source" (
+    copy /y "%ROOT%php.ini.source" "%PHP_INI%" >nul
+  ) else if exist "%PHP_DIR%\php.ini-development" (
     copy /y "%PHP_DIR%\php.ini-development" "%PHP_INI%" >nul
   ) else if exist "%PHP_DIR%\php.ini-production" (
     copy /y "%PHP_DIR%\php.ini-production" "%PHP_INI%" >nul
@@ -98,13 +100,9 @@ if not exist "%PHP_INI%" (
   )
 )
 
->> "%PHP_INI%" echo.
->> "%PHP_INI%" echo ; Added by setup.bat
->> "%PHP_INI%" echo extension_dir = "%PHP_DIR%\ext"
->> "%PHP_INI%" echo extension=openssl
->> "%PHP_INI%" echo extension=pdo_sqlite
->> "%PHP_INI%" echo extension=sqlite3
->> "%PHP_INI%" echo extension=sodium
+rem Apply local paths and ensure required extensions are enabled
+powershell -NoProfile -Command "$ini='%PHP_INI%'; $dir='%PHP_DIR%\\ext'; $ssl='%PHP_DIR%\\extras\\ssl\\cacert.pem'; $c=Get-Content $ini; $c=$c -replace '^[;]*\\s*extension_dir\\s*=.*', ('extension_dir = \"' + $dir + '\"'); if (Test-Path $ssl) { $c=$c -replace '^[;]*\\s*curl\\.cainfo\\s*=.*', ('curl.cainfo=\"' + $ssl + '\"'); $c=$c -replace '^[;]*\\s*openssl\\.cafile\\s*=.*', ('openssl.cafile=\"' + $ssl + '\"'); } Set-Content -Encoding ASCII $ini $c"
+powershell -NoProfile -Command "$ini='%PHP_INI%'; $need=@('openssl','pdo_sqlite','sqlite3','sodium','zip'); $c=Get-Content $ini; foreach($e in $need){ if(-not ($c -match ('^\\s*extension\\s*=\\s*' + [regex]::Escape($e) + '\\s*$'))){ Add-Content -Encoding ASCII $ini ('extension=' + $e) } }"
 
 echo php.ini OK: %PHP_INI%
 exit /b 0
