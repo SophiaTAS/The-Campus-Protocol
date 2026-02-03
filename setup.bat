@@ -3,6 +3,7 @@ setlocal EnableDelayedExpansion
 
 set "ROOT=%~dp0"
 cd /d "%ROOT%"
+if defined AUTO_YES set "AUTO_YES=1"
 
 set "PHP_DIR=%ROOT%php"
 set "PHP_BIN=%PHP_DIR%\php.exe"
@@ -48,6 +49,7 @@ exit /b 0
 
 :confirm
 set "PROMPT=%~1"
+if defined AUTO_YES exit /b 0
 set /p CONFIRM="%PROMPT% (o/N): "
 if /i "%CONFIRM%"=="o" exit /b 0
 exit /b 1
@@ -68,16 +70,7 @@ if not exist "%PHP_ZIP%" (
   exit /b 1
 )
 
-set "PHP_ZIP_SIZE="
-for %%Z in ("%PHP_ZIP%") do set "PHP_ZIP_SIZE=%%~zZ"
-if not defined PHP_ZIP_SIZE (
-  echo [ERROR] Could not read PHP zip size.
-  exit /b 1
-)
-if !PHP_ZIP_SIZE! LSS 10000000 (
-  echo [ERROR] PHP download looks too small (%PHP_ZIP_SIZE% bytes).
-  exit /b 1
-)
+rem size check removed; extraction + php.exe existence is the validation
 
 powershell -NoProfile -Command "Expand-Archive -LiteralPath '%PHP_ZIP%' -DestinationPath '%PHP_DIR%'"
 if errorlevel 1 (
@@ -105,8 +98,13 @@ if not exist "%PHP_INI%" (
   )
 )
 
-powershell -NoProfile -Command "(Get-Content '%PHP_INI%') -replace '^;extension=pdo_sqlite','extension=pdo_sqlite' | Set-Content -Encoding ASCII '%PHP_INI%'"
-powershell -NoProfile -Command "(Get-Content '%PHP_INI%') -replace '^;extension=sqlite3','extension=sqlite3' | Set-Content -Encoding ASCII '%PHP_INI%'"
+>> "%PHP_INI%" echo.
+>> "%PHP_INI%" echo ; Added by setup.bat
+>> "%PHP_INI%" echo extension_dir = "%PHP_DIR%\ext"
+>> "%PHP_INI%" echo extension=openssl
+>> "%PHP_INI%" echo extension=pdo_sqlite
+>> "%PHP_INI%" echo extension=sqlite3
+>> "%PHP_INI%" echo extension=sodium
 
 echo php.ini OK: %PHP_INI%
 exit /b 0

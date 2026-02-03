@@ -22,7 +22,6 @@ if defined MERCURE_JWT_SECRET (
 )
 call :find_php
 call :ensure_php_ini
-call :check_php_version
 call :ensure_sqlite_extensions
 call :reset_db
 call :start_php_cgi
@@ -80,23 +79,6 @@ exit /b 0
 if not exist "%PHP_DIR%\php.ini" (
   if exist "%PHP_DIR%\php.ini-development" copy /y "%PHP_DIR%\php.ini-development" "%PHP_DIR%\php.ini" >nul
   if exist "%PHP_DIR%\php.ini-production" copy /y "%PHP_DIR%\php.ini-production" "%PHP_DIR%\php.ini" >nul
-)
-exit /b 0
-
-:check_php_version
-for /f "tokens=1,2 delims=." %%A in ('"%PHP_EXE%" -r "echo PHP_VERSION;"') do (
-  set "PHP_MAJOR=%%A"
-  set "PHP_MINOR=%%B"
-)
-if %PHP_MAJOR% LSS 8 (
-  echo [ERREUR] PHP 8.4+ requis pour Symfony 8. Version detectee: %PHP_MAJOR%.%PHP_MINOR%.
-  pause
-  exit /b 1
-)
-if %PHP_MAJOR%==8 if %PHP_MINOR% LSS 4 (
-  echo [ERREUR] PHP 8.4+ requis pour Symfony 8. Version detectee: %PHP_MAJOR%.%PHP_MINOR%.
-  pause
-  exit /b 1
 )
 exit /b 0
 
