@@ -11,6 +11,8 @@ set "PHP_INI=%PHP_DIR%\php.ini"
 set "PHP_URL=https://windows.php.net/downloads/releases/latest/php-8.5-Win32-vs17-x64-latest.zip"
 set "PHP_ZIP=%ROOT%php.zip"
 set "COMPOSER_PHAR=%ROOT%composer.phar"
+set "CACERT_URL=https://curl.se/ca/cacert.pem"
+set "CACERT_PATH=%PHP_DIR%\extras\ssl\cacert.pem"
 
 call :print_header
 
@@ -106,6 +108,7 @@ powershell -NoProfile -Command "$ini='%PHP_INI%'; $need=@('openssl','pdo_sqlite'
 >> "%PHP_INI%" echo.
 >> "%PHP_INI%" echo ; Force local extensions (setup.bat)
 >> "%PHP_INI%" echo extension_dir = "%PHP_DIR%\ext"
+call :ensure_cacert
 
 echo php.ini OK: %PHP_INI%
 exit /b 0
@@ -121,9 +124,24 @@ if not exist "%COMPOSER_PHAR%" (
 echo Composer OK: %COMPOSER_PHAR%
 exit /b 0
 
+:ensure_cacert
+if not exist "%CACERT_PATH%" (
+  if not exist "%PHP_DIR%\extras\ssl" mkdir "%PHP_DIR%\extras\ssl" >nul 2>&1
+  powershell -NoProfile -Command "Invoke-WebRequest -Uri '%CACERT_URL%' -OutFile '%CACERT_PATH%'"
+)
+if exist "%CACERT_PATH%" (
+  powershell -NoProfile -Command "$ini='%PHP_INI%'; $ssl='%CACERT_PATH%'; $c=Get-Content $ini; $c=$c -replace '^[;]*\\s*curl\\.cainfo\\s*=.*', ('curl.cainfo=\"' + $ssl + '\"'); $c=$c -replace '^[;]*\\s*openssl\\.cafile\\s*=.*', ('openssl.cafile=\"' + $ssl + '\"'); Set-Content -Encoding ASCII $ini $c"
+)
+exit /b 0
+
 :composer_install
 set "PHPRC=%PHP_DIR%"
+"%PHP_BIN%" -c "%PHP_INI%" "%COMPOSER_PHAR%" clear-cache >nul 2>&1
 "%PHP_BIN%" -c "%PHP_INI%" "%COMPOSER_PHAR%" install --no-interaction --prefer-dist
+if %errorlevel% neq 0 (
+  echo [WARN] composer install failed, retrying with --prefer-source
+  "%PHP_BIN%" -c "%PHP_INI%" "%COMPOSER_PHAR%" install --no-interaction --prefer-source
+)
 if %errorlevel% neq 0 (
   echo [ERROR] Composer install failed.
   exit /b 1
