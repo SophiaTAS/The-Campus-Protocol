@@ -103,6 +103,9 @@ if not exist "%PHP_INI%" (
 rem Apply local paths and ensure required extensions are enabled
 powershell -NoProfile -Command "$ini='%PHP_INI%'; $dir='%PHP_DIR%\\ext'; $ssl='%PHP_DIR%\\extras\\ssl\\cacert.pem'; $c=Get-Content $ini; $c=$c -replace '^[;]*\\s*extension_dir\\s*=.*', ('extension_dir = \"' + $dir + '\"'); if (Test-Path $ssl) { $c=$c -replace '^[;]*\\s*curl\\.cainfo\\s*=.*', ('curl.cainfo=\"' + $ssl + '\"'); $c=$c -replace '^[;]*\\s*openssl\\.cafile\\s*=.*', ('openssl.cafile=\"' + $ssl + '\"'); } Set-Content -Encoding ASCII $ini $c"
 powershell -NoProfile -Command "$ini='%PHP_INI%'; $need=@('openssl','pdo_sqlite','sqlite3','sodium','zip'); $c=Get-Content $ini; foreach($e in $need){ if(-not ($c -match ('^\\s*extension\\s*=\\s*' + [regex]::Escape($e) + '\\s*$'))){ Add-Content -Encoding ASCII $ini ('extension=' + $e) } }"
+>> "%PHP_INI%" echo.
+>> "%PHP_INI%" echo ; Force local extensions (setup.bat)
+>> "%PHP_INI%" echo extension_dir = "%PHP_DIR%\ext"
 
 echo php.ini OK: %PHP_INI%
 exit /b 0
@@ -119,7 +122,8 @@ echo Composer OK: %COMPOSER_PHAR%
 exit /b 0
 
 :composer_install
-"%PHP_BIN%" "%COMPOSER_PHAR%" install --no-interaction --prefer-dist
+set "PHPRC=%PHP_DIR%"
+"%PHP_BIN%" -c "%PHP_INI%" "%COMPOSER_PHAR%" install --no-interaction --prefer-dist
 if %errorlevel% neq 0 (
   echo [ERROR] Composer install failed.
   exit /b 1
@@ -132,8 +136,8 @@ if not exist "%ROOT%var" mkdir "%ROOT%var"
 
 del /f /q "%DB_PATH%" >nul 2>&1
 copy /y NUL "%DB_PATH%" >nul
-"%PHP_BIN%" bin\console doctrine:migrations:migrate --env=prod --no-interaction
+"%PHP_BIN%" -c "%PHP_INI%" bin\console doctrine:migrations:migrate --env=prod --no-interaction
 if %errorlevel% neq 0 exit /b 1
-"%PHP_BIN%" scripts\seed_sqlite.php
+"%PHP_BIN%" -c "%PHP_INI%" scripts\seed_sqlite.php
 if %errorlevel% neq 0 exit /b 1
 exit /b 0
