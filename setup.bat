@@ -68,8 +68,13 @@ if not exist "%PHP_ZIP%" (
   exit /b 1
 )
 
+set "PHP_ZIP_SIZE="
 for %%Z in ("%PHP_ZIP%") do set "PHP_ZIP_SIZE=%%~zZ"
-if %PHP_ZIP_SIZE% LSS 10000000 (
+if not defined PHP_ZIP_SIZE (
+  echo [ERROR] Could not read PHP zip size.
+  exit /b 1
+)
+if !PHP_ZIP_SIZE! LSS 10000000 (
   echo [ERROR] PHP download looks too small (%PHP_ZIP_SIZE% bytes).
   exit /b 1
 )
