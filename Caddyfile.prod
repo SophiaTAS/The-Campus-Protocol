@@ -9,7 +9,7 @@
   file_server
 
   mercure {
-    transport_url bolt://./mercure.db
+    transport bolt ./mercure.db
 
     publisher_jwt {env.MERCURE_JWT_SECRET}
     subscriber_jwt {env.MERCURE_JWT_SECRET}
