@@ -131,6 +131,8 @@ if not exist "%ROOT%Caddyfile.prod" (
 )
 set "ROOT_DIR=%ROOT_DIR%"
 set "MERCURE_JWT_SECRET=%MERCURE_JWT_SECRET%"
+mkdir "%ROOT%var\caddy" >nul 2>&1
+set "CADDY_DATA_DIR=%ROOT%var\caddy"
 start "Caddy/Mercure (NE PAS FERMER)" "%ROOT%mercure.exe" run --config "%ROOT%Caddyfile.prod"
 exit /b 0
 
