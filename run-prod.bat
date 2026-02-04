@@ -1,18 +1,26 @@
 @echo off
-setlocal DisableDelayedExpansion
+setlocal EnableExtensions DisableDelayedExpansion
 if defined TRACE echo on
 
+rem ============================
+rem Root folder (without trailing \)
+rem ============================
 set "ROOT=%~dp0"
+if "%ROOT:~-1%"=="\" set "ROOT=%ROOT:~0,-1%"
 cd /d "%ROOT%"
 
 set "APP_ENV=prod"
 set "APP_DEBUG=0"
-set "ROOT_DIR=%ROOT%"
+set "ROOT_DIR=%ROOT%\"
 
 call :print_header
 call :stop_processes
+
+rem ============================
+rem Read MERCURE_JWT_SECRET from .env / .env.local
+rem ============================
 set "MERCURE_JWT_SECRET="
-for /f "usebackq tokens=1* delims==" %%A in (`findstr /R /C:"^MERCURE_JWT_SECRET=" "%ROOT%.env" "%ROOT%.env.local" 2^>nul`) do (
+for /f "usebackq tokens=1* delims==" %%A in (`findstr /R /C:"^MERCURE_JWT_SECRET=" "%ROOT%\.env" "%ROOT%\.env.local" 2^>nul`) do (
   set "MERCURE_JWT_SECRET=%%B"
 )
 if defined MERCURE_JWT_SECRET (
@@ -20,12 +28,14 @@ if defined MERCURE_JWT_SECRET (
 ) else (
   set "MERCURE_JWT_SECRET=dev-secret"
 )
+
 call :find_php
 call :ensure_php_ini
 call :ensure_sqlite_extensions
 call :reset_db
 call :start_php_cgi
 call :start_mercure
+
 echo Ouverture du navigateur...
 timeout /t 2 /nobreak >nul
 start "" "http://127.0.0.1:3000/"
@@ -48,11 +58,12 @@ taskkill /IM caddy.exe /F >nul 2>&1
 exit /b 0
 
 :find_php
-set "PHP_DIR=%ROOT%php"
+set "PHP_DIR=%ROOT%\php"
 set "PHP_CGI="
 set "PHP_EXE="
 if exist "%PHP_DIR%\php.exe" set "PHP_EXE=%PHP_DIR%\php.exe"
 if exist "%PHP_DIR%\php-cgi.exe" set "PHP_CGI=%PHP_DIR%\php-cgi.exe"
+
 if not defined PHP_CGI (
   for /f "delims=" %%P in ('where php-cgi 2^>nul') do (
     set "PHP_CGI=%%P"
@@ -65,9 +76,11 @@ if not defined PHP_CGI (
   pause
   exit /b 1
 )
+
 if not defined PHP_EXE (
   for %%X in ("%PHP_CGI%") do set "PHP_EXE=%%~dpXphp.exe"
 )
+
 if not exist "%PHP_EXE%" (
   echo [ERREUR] php.exe introuvable.
   pause
@@ -88,21 +101,25 @@ for /f "tokens=2,* delims=:" %%A in ('"%PHP_EXE%" --ini ^| findstr /i "Loaded Co
   set "PHP_INI=%%B"
 )
 set "PHP_INI=%PHP_INI:~1%"
-if /i "%PHP_INI%"=="%ROOT%php\php.ini" (
-  powershell -NoProfile -Command "(Get-Content '%ROOT%php\php.ini') -replace '^;extension=pdo_sqlite','extension=pdo_sqlite' | Set-Content -Encoding ASCII '%ROOT%php\php.ini'"
-  powershell -NoProfile -Command "(Get-Content '%ROOT%php\php.ini') -replace '^;extension=sqlite3','extension=sqlite3' | Set-Content -Encoding ASCII '%ROOT%php\php.ini'"
+
+if /i "%PHP_INI%"=="%ROOT%\php\php.ini" (
+  powershell -NoProfile -Command "(Get-Content '%ROOT%\php\php.ini') -replace '^;extension=pdo_sqlite','extension=pdo_sqlite' | Set-Content -Encoding ASCII '%ROOT%\php\php.ini'"
+  powershell -NoProfile -Command "(Get-Content '%ROOT%\php\php.ini') -replace '^;extension=sqlite3','extension=sqlite3' | Set-Content -Encoding ASCII '%ROOT%\php\php.ini'"
 )
 exit /b 0
 
 :reset_db
 echo Reinitialisation de la base SQLite
-mkdir "%ROOT%var" >nul 2>&1
-del /f /q "%ROOT%var\data.db" >nul 2>&1
-if exist "%ROOT%var\data.db" goto :db_locked
-copy /y NUL "%ROOT%var\data.db" >nul
+mkdir "%ROOT%\var" >nul 2>&1
+del /f /q "%ROOT%\var\data.db" >nul 2>&1
+if exist "%ROOT%\var\data.db" goto :db_locked
+
+copy /y NUL "%ROOT%\var\data.db" >nul
 if errorlevel 1 goto :fail_db
+
 "%PHP_EXE%" bin\console doctrine:migrations:migrate --env=prod --no-interaction
 if errorlevel 1 goto :fail_migrate
+
 "%PHP_EXE%" scripts\seed_sqlite.php
 if errorlevel 1 goto :fail_seed
 exit /b 0
@@ -119,21 +136,26 @@ exit /b 0
 
 :start_mercure
 echo Demarrage de Caddy/Mercure...
-if not exist "%ROOT%mercure.exe" (
+
+if not exist "%ROOT%\mercure.exe" (
   echo [ERREUR] mercure.exe introuvable.
   pause
   exit /b 1
 )
-if not exist "%ROOT%Caddyfile.prod" (
+if not exist "%ROOT%\Caddyfile.prod" (
   echo [ERREUR] Caddyfile.prod introuvable.
   pause
   exit /b 1
 )
-set "ROOT_DIR=%ROOT_DIR%"
-set "MERCURE_JWT_SECRET=%MERCURE_JWT_SECRET%"
-mkdir "%ROOT%var\caddy" >nul 2>&1
-set "CADDY_DATA_DIR=%ROOT%var\caddy"
-start "Caddy/Mercure (NE PAS FERMER)" "%ROOT%mercure.exe" run --config "%ROOT%Caddyfile.prod"
+
+rem --- portable Caddy data dir (avoid AppData) ---
+mkdir "%ROOT%\var\caddy" >nul 2>&1
+set "CADDY_DATA_DIR=%ROOT%\var\caddy"
+set "CADDY_CONFIG_DIR=%ROOT%\var\caddy"
+
+rem --- start in its own window, keep open for logs ---
+set "MERCURE_DB_PATH=%ROOT%\mercure.db"
+start "Caddy/Mercure (NE PAS FERMER)" cmd /k ""%ROOT%\mercure.exe" run --config "%ROOT%\Caddyfile.prod""
 exit /b 0
 
 :fail_db
@@ -150,3 +172,4 @@ exit /b 1
 echo [ERREUR] Seed SQLite echoue.
 pause
 exit /b 1
+
